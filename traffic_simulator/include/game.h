@@ -41,7 +41,7 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore);
 void inizializza_giocatore(Giocatore *giocatore);
 void gestisciInput(Giocatore *giocatore);
 void inizializza_ostacoli();
-void aggiorna_ostacoli();
+void aggiorna_ostacoli(float moltiplicatore_velocita);
 const Ostacolo* get_ostacoli();
 void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]);
 

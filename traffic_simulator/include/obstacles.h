@@ -12,7 +12,7 @@
 // Funzioni per la gestione degli ostacoli
 void inizializza_ostacoli();
 void genera_ostacolo();
-void aggiorna_ostacoli();
+void aggiorna_ostacoli(float moltiplicatore_velocita);
 void disegna_ostacoli();
 
 // Fornisce accesso in sola lettura all'array di ostacoli per il controllo collisioni

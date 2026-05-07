@@ -32,7 +32,7 @@ void genera_ostacolo() {
 }
 
 // Aggiorna la posizione di tutti gli ostacoli attivi.
-void aggiorna_ostacoli() {
+void aggiorna_ostacoli(float moltiplicatore_velocita) {
     // Aumenta il contatore per la generazione.
     // La frequenza di generazione dipende da `contatore_generazione`.
     contatore_generazione++;
@@ -42,9 +42,10 @@ void aggiorna_ostacoli() {
     }
 
     // Logica di 'caduta' degli ostacoli.
+    // La velocità di caduta è moltiplicata dal moltiplicatore di velocità del giocatore
     for (int i = 0; i < MAX_OSTACOLI; ++i) {
         if (ostacoli[i].riga >= 0) { // Se l'ostacolo è attivo
-            ostacoli[i].riga++; // Aumenta la sua riga, facendolo 'scendere'
+            ostacoli[i].riga += moltiplicatore_velocita; // Aumenta la sua riga basato sulla velocità
 
             // Se un ostacolo supera l'altezza dello schermo, viene disattivato.
             if (ostacoli[i].riga >= ALTEZZA_SCHERMO) {

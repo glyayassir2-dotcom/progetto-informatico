@@ -73,17 +73,17 @@ void mostraGameOver(StatoGioco *statoCorrente, const Giocatore *giocatore) {
     #endif
 
     printf("\n\n");
-    printf("============================================================\n");
-    printf("||                                                        ||\n");
-    printf("||  GGGG   AAAAA  M   M  EEEEE    OOOOO   V   V  EEEEE     ||\n");
-    printf("|| G      A   A  MM MM  E       O     O  V   V  E         ||\n");
-    printf("|| G  GG  AAAAA  M M M  EEEE    O     O   V V   EEEE      ||\n");
-    printf("|| G   G  A   A  M   M  E       O     O   V V   E         ||\n");
-    printf("||  GGGG  A   A  M   M  EEEEE    OOOOO     V    EEEEE     ||\n");
-    printf("||                                                        ||\n");
-    printf("||                      GAME OVER                         ||\n");
-    printf("||                                                        ||\n");
-    printf("============================================================\n\n");
+    printf("====================================================\n");
+    printf("||                                                ||\n");
+    printf("||  GGG  AAA  M   M  EEE   OOO  V   V  EEE  RRRR  ||\n");
+    printf("|| G     A A  MM MM  E    O   O V   V  E    R   R ||\n");
+    printf("|| G GG  AAA  M M M  EE   O   O  V V   EE   RRRR  ||\n");
+    printf("|| G  G  A A  M   M  E    O   O  V V   E    R R   ||\n");
+    printf("||  GGG  A A  M   M  EEE   OOO    V    EEE  R  R  ||\n");
+    printf("||                                                ||\n");
+    printf("||                   GAME OVER                    ||\n");
+    printf("||                                                ||\n");
+    printf("====================================================\n\n"); 
     printf("Giocatore: %s\n", giocatore->nome[0] ? giocatore->nome : "Anonimo");
     printf("Km percorsi: %.2f km\n", giocatore->km);
     printf("Tempo di gioco: %d secondi\n\n", giocatore->tempo);
@@ -127,7 +127,17 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
             tempo_gioco += delta_sec;
             giocatore->tempo = (int)tempo_gioco;
             gestisciInput(giocatore);
-            aggiorna_ostacoli();
+
+            // Aggiorna velocità in base ai km percorsi
+            // Aumenta di 0.25x ogni 10 km, fino a max 5x
+            float multiplier = 1.0f + (giocatore->km / 10.0f) * 0.25f;
+            if (multiplier > 5.0f) {
+                multiplier = 5.0f;
+            }
+            giocatore->velocita = 60.0f * multiplier;
+
+            // Aggiorna gli ostacoli con il moltiplicatore di velocità
+            aggiorna_ostacoli(multiplier);
 
             // Controllo collisioni
             const Ostacolo *ostacoli = get_ostacoli();
@@ -138,21 +148,6 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
                     break;
                 }
             }
-
-            // Aggiorna velocità in base ai km percorsi
-            float multiplier;
-            if (giocatore->km < 10.0) {
-                multiplier = 1.0f;
-            } else if (giocatore->km < 20.0) {
-                multiplier = 1.25f;
-            } else if (giocatore->km < 30.0) {
-                multiplier = 1.50f;
-            } else if (giocatore->km < 40.0) {
-                multiplier = 1.75f;
-            } else {
-                multiplier = 2.0f;
-            }
-            giocatore->velocita = 60.0f * multiplier;
 
             // Calcola incremento distanza con fisica arcade: 10 sec a 60 km/h = 10 km
             const double arcade_scale = 60.0;
