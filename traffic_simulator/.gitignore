@@ -1,0 +1,4 @@
+obj/
+traffic_simulator
+traffic_simulator_new
+*.o

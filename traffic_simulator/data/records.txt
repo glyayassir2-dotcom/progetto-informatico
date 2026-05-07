@@ -1,0 +1,4 @@
+prodbyassp,0.28,8
+sincewrelymo,0.50,14
+momo,36.85,28
+momo,60.04,40

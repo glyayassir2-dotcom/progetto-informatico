@@ -139,19 +139,25 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
                 }
             }
 
-            // Fisica base: v [km/h] = d [km] / t [h], quindi d = v * t.
-            // Usiamo delta_sec in secondi e un fattore arcade per rendere la distanza perceptibile.
-            const float arcade_scale = 120.0f;
-            double distance_increment = ((double)giocatore->velocita * delta_sec / 3600.0) * arcade_scale;
-            giocatore->km += distance_increment;
-
-            // Aumenta la velocità in modo graduale in base alla distanza effettivamente percorsa.
-            // 0.5 km/h ogni 200 km percorsi.
-            float speed_increment = 0.5f * (float)(distance_increment / 200.0);
-            giocatore->velocita += speed_increment;
-            if (giocatore->velocita > 20.0f) {
-                giocatore->velocita = 20.0f; // Limite massimo di velocità
+            // Aggiorna velocità in base ai km percorsi
+            float multiplier;
+            if (giocatore->km < 10.0) {
+                multiplier = 1.0f;
+            } else if (giocatore->km < 20.0) {
+                multiplier = 1.25f;
+            } else if (giocatore->km < 30.0) {
+                multiplier = 1.50f;
+            } else if (giocatore->km < 40.0) {
+                multiplier = 1.75f;
+            } else {
+                multiplier = 2.0f;
             }
+            giocatore->velocita = 60.0f * multiplier;
+
+            // Calcola incremento distanza con fisica arcade: 10 sec a 60 km/h = 10 km
+            const double arcade_scale = 60.0;
+            double distance_increment = (giocatore->velocita * delta_sec / 3600.0) * arcade_scale;
+            giocatore->km += distance_increment;
         }
 
         disegnaSchermo(giocatore, get_ostacoli());

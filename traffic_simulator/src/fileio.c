@@ -1,3 +1,7 @@
+#ifndef _WIN32
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include "fileio.h"
 #include <stdio.h>
 #include <string.h>
@@ -6,7 +10,7 @@
 static const int MAX_RECORDS_FILE = 100;
 
 void salva_record(const Record *record) {
-    FILE *file = fopen("records.txt", "a");
+    FILE *file = fopen("data/records.txt", "a");
     if (file == NULL) {
         return;
     }
@@ -16,7 +20,7 @@ void salva_record(const Record *record) {
 }
 
 void leggi_record(Record *records, int *num_records) {
-    FILE *file = fopen("records.txt", "r");
+    FILE *file = fopen("data/records.txt", "r");
     if (file == NULL) {
         *num_records = 0;
         return;
@@ -35,7 +39,7 @@ void leggi_record(Record *records, int *num_records) {
 }
 
 void salva_cronologia(const Giocatore *giocatore) {
-    FILE *file = fopen("history.csv", "a");
+    FILE *file = fopen("data/history.csv", "a");
     if (file == NULL) {
         return;
     }

@@ -32,3 +32,5 @@ yasso,0.43,0
 gg,0.14,0
 gg,2.84,0
 prod,0.07,1
+Anonimo,0.11,0
+Anonimo,0.04,0
