@@ -25,14 +25,26 @@ void genera_ostacolo() {
         if (ostacoli[i].riga < 0) {
             ostacoli[i].riga = 0; // Nasce alla riga 0 (in cima allo schermo)
             ostacoli[i].corsia = rand() % NUM_CORSIE; // Posizione in una corsia casuale
-            ostacoli[i].simbolo = '#'; // Simbolo di default
+            ostacoli[i].tipo = (TipoOstacolo)(rand() % 3); // Tipo casuale
+
+            switch (ostacoli[i].tipo) {
+                case AUTO:
+                    ostacoli[i].simbolo = '#';
+                    break;
+                case CAMION:
+                    ostacoli[i].simbolo = 'H';
+                    break;
+                case BUCA:
+                    ostacoli[i].simbolo = 'O';
+                    break;
+            }
             break; // Abbiamo generato un ostacolo, usciamo dal ciclo
         }
     }
 }
 
 // Aggiorna la posizione di tutti gli ostacoli attivi.
-void aggiorna_ostacoli(float moltiplicatore_velocita) {
+void aggiorna_ostacoli(float moltiplicatore_velocita __attribute__((unused))) {
     // Aumenta il contatore per la generazione.
     // La frequenza di generazione dipende da `contatore_generazione`.
     contatore_generazione++;
@@ -41,11 +53,10 @@ void aggiorna_ostacoli(float moltiplicatore_velocita) {
         contatore_generazione = 0;
     }
 
-    // Logica di 'caduta' degli ostacoli.
-    // La velocità di caduta è moltiplicata dal moltiplicatore di velocità del giocatore
+    // Logica di 'caduta' degli ostacoli: si muovono di 1 riga per ciclo
     for (int i = 0; i < MAX_OSTACOLI; ++i) {
         if (ostacoli[i].riga >= 0) { // Se l'ostacolo è attivo
-            ostacoli[i].riga += moltiplicatore_velocita; // Aumenta la sua riga basato sulla velocità
+            ostacoli[i].riga += 1; // Muove di una riga ad ogni ciclo
 
             // Se un ostacolo supera l'altezza dello schermo, viene disattivato.
             if (ostacoli[i].riga >= ALTEZZA_SCHERMO) {
@@ -80,7 +91,7 @@ void disegna_ostacoli() {
 
 }
 
-// Funzione getter per fornire accesso in sola lettura all'array degli ostacoli
-const Ostacolo* get_ostacoli() {
+// Funzione getter per fornire accesso all'array degli ostacoli
+Ostacolo* get_ostacoli() {
     return ostacoli;
 }

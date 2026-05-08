@@ -32,21 +32,36 @@ void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]) {
         schermo[i][12] = '|';
     }
     
-    // Disegna il giocatore
+    // Disegna gli ostacoli prima del giocatore
+    for (int i = 0; i < MAX_OSTACOLI; i++) {
+        if (ostacoli[i].riga >= 0 && ostacoli[i].riga < ALTEZZA_SCHERMO) {
+            int pos = ostacoli[i].corsia * 4 + 1;
+            switch (ostacoli[i].tipo) {
+                case AUTO:
+                case BUCA:
+                    schermo[ostacoli[i].riga][pos] = ostacoli[i].simbolo;
+                    schermo[ostacoli[i].riga][pos + 1] = ostacoli[i].simbolo;
+                    schermo[ostacoli[i].riga][pos + 2] = ostacoli[i].simbolo;
+                    break;
+                case CAMION:
+                    schermo[ostacoli[i].riga][pos] = ostacoli[i].simbolo;
+                    schermo[ostacoli[i].riga][pos + 1] = ostacoli[i].simbolo;
+                    schermo[ostacoli[i].riga][pos + 2] = ostacoli[i].simbolo;
+                    if (ostacoli[i].riga + 1 < ALTEZZA_SCHERMO) {
+                        schermo[ostacoli[i].riga + 1][pos] = ostacoli[i].simbolo;
+                        schermo[ostacoli[i].riga + 1][pos + 1] = ostacoli[i].simbolo;
+                        schermo[ostacoli[i].riga + 1][pos + 2] = ostacoli[i].simbolo;
+                    }
+                    break;
+            }
+        }
+    }
+
+    // Disegna il giocatore dopo gli ostacoli, per mostrare sempre il veicolo
     if (g->vivo) {
         schermo[RIGA_GIOCATORE][g->corsia * 4 + 1] = '[';
         schermo[RIGA_GIOCATORE][g->corsia * 4 + 2] = 'O';
         schermo[RIGA_GIOCATORE][g->corsia * 4 + 3] = ']';
-    }
-
-    // Disegna gli ostacoli
-    for (int i = 0; i < MAX_OSTACOLI; i++) {
-        if (ostacoli[i].riga >= 0 && ostacoli[i].riga < ALTEZZA_SCHERMO) {
-            char simbolo_ostacolo = ostacoli[i].simbolo == '#' ? '#' : 'X';
-            schermo[ostacoli[i].riga][ostacoli[i].corsia * 4 + 1] = simbolo_ostacolo;
-            schermo[ostacoli[i].riga][ostacoli[i].corsia * 4 + 2] = simbolo_ostacolo;
-            schermo[ostacoli[i].riga][ostacoli[i].corsia * 4 + 3] = simbolo_ostacolo;
-        }
     }
 
     // Pulisce lo schermo
@@ -59,7 +74,19 @@ void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]) {
     // Stampa le statistiche e la schermata
     printf("KM: %.2f | Velocita: %.1f km/h\n", g->km, g->velocita);
     for (int i = 0; i < ALTEZZA_SCHERMO; i++) {
-        printf("%s\n", schermo[i]);
+        for (int j = 0; j < NUM_CORSIE * 4 + 1; j++) {
+            char c = schermo[i][j];
+            int isGiocatore = (i == RIGA_GIOCATORE && j >= g->corsia * 4 + 1 && j <= g->corsia * 4 + 3 &&
+                               (c == '[' || c == 'O' || c == ']'));
+            if (isGiocatore) {
+                printf("\033[1;31m%c\033[0m", c);
+            } else if (c == '#' || c == 'H' || c == 'O') {
+                printf("\033[1;33m%c\033[0m", c);
+            } else {
+                printf("%c", c);
+            }
+        }
+        printf("\n");
     }
 }
 

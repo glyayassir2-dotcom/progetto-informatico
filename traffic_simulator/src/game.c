@@ -73,17 +73,17 @@ void mostraGameOver(StatoGioco *statoCorrente, const Giocatore *giocatore) {
     #endif
 
     printf("\n\n");
-    printf("====================================================\n");
-    printf("||                                                ||\n");
-    printf("||  GGG  AAA  M   M  EEE   OOO  V   V  EEE  RRRR  ||\n");
-    printf("|| G     A A  MM MM  E    O   O V   V  E    R   R ||\n");
-    printf("|| G GG  AAA  M M M  EE   O   O  V V   EE   RRRR  ||\n");
-    printf("|| G  G  A A  M   M  E    O   O  V V   E    R R   ||\n");
-    printf("||  GGG  A A  M   M  EEE   OOO    V    EEE  R  R  ||\n");
-    printf("||                                                ||\n");
-    printf("||                   GAME OVER                    ||\n");
-    printf("||                                                ||\n");
-    printf("====================================================\n\n"); 
+    printf(" ==================================================== \n");
+    printf("||                                                     ||\n");
+    printf("||  GGG   AAA   M   M  EEE   OOO   V   V   EEE   RRRR  ||\n");
+    printf("|| G      A  A  MM MM  E    O   O  V   V   E     R   R ||\n");
+    printf("|| G GG   AAAA  M M M  EE   O   O   V V    EE    RRRR  ||\n");
+    printf("|| G  G  A   A  M   M  E    O   O   V V    E     R R   ||\n");
+    printf("||  GGG  A   A  M   M  EEE   OOO     V     EEE   R  R  ||\n");
+    printf("||                                                     ||\n");
+    printf("||                   GAME OVER                         ||\n");
+    printf("||                                                     ||\n");
+    printf(" ====================================================\n\n"); 
     printf("Giocatore: %s\n", giocatore->nome[0] ? giocatore->nome : "Anonimo");
     printf("Km percorsi: %.2f km\n", giocatore->km);
     printf("Tempo di gioco: %d secondi\n\n", giocatore->tempo);
@@ -107,62 +107,74 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
     inizializza_giocatore(giocatore);
     inizializza_ostacoli();
 
-    struct timespec last_time, current_time;
-    double tempo_gioco = 0.0;
-    clock_gettime(CLOCK_MONOTONIC, &last_time);
+    static double prossimo_traguardo_km = 10.0; // Variabile statica per l'aumento di velocità
 
     while (*statoCorrente == GIOCO) {
-        clock_gettime(CLOCK_MONOTONIC, &current_time);
-        double delta_sec = (current_time.tv_sec - last_time.tv_sec) +
-                           (current_time.tv_nsec - last_time.tv_nsec) / 1e9;
-        if (delta_sec < 0.0) {
-            delta_sec = 0.0;
-        }
-        if (delta_sec > 0.1) {
-            delta_sec = 0.1; // Limita delta per evitare salti troppo grandi dopo pause o freeze
-        }
-        last_time = current_time;
-
         if (giocatore->vivo) {
-            tempo_gioco += delta_sec;
-            giocatore->tempo = (int)tempo_gioco;
             gestisciInput(giocatore);
 
-            // Aggiorna velocità in base ai km percorsi
-            // Aumenta di 0.25x ogni 10 km, fino a max 5x
-            float multiplier = 1.0f + (giocatore->km / 10.0f) * 0.25f;
-            if (multiplier > 5.0f) {
-                multiplier = 5.0f;
-            }
-            giocatore->velocita = 60.0f * multiplier;
-
-            // Aggiorna gli ostacoli con il moltiplicatore di velocità
-            aggiorna_ostacoli(multiplier);
+            // Aggiorna gli ostacoli
+            aggiorna_ostacoli(1.0f);
 
             // Controllo collisioni
-            const Ostacolo *ostacoli = get_ostacoli();
+            Ostacolo *ostacoli = get_ostacoli();
             for (int i = 0; i < MAX_OSTACOLI; i++) {
-                if (ostacoli[i].riga == RIGA_GIOCATORE && ostacoli[i].corsia == giocatore->corsia) {
-                    giocatore->vivo = 0; // Il giocatore è morto!
-                    *statoCorrente = GAMEOVER;
-                    break;
+                if (ostacoli[i].corsia != giocatore->corsia || ostacoli[i].riga < 0) {
+                    continue;
+                }
+
+                int collisione = 0;
+                if (ostacoli[i].riga == RIGA_GIOCATORE) {
+                    collisione = 1;
+                } else if (ostacoli[i].tipo == CAMION && ostacoli[i].riga + 1 == RIGA_GIOCATORE) {
+                    collisione = 1; // Il camion occupa due righe
+                }
+
+                if (collisione) {
+                    if (ostacoli[i].tipo == BUCA) {
+                        // Se colpisco una buca, riduco la velocità di 15.0
+                        giocatore->velocita -= 15.0f;
+                        if (giocatore->velocita < 30.0f) {
+                            giocatore->velocita = 30.0f;
+                        }
+                        ostacoli[i].riga = -1; // Rimuove la buca dopo l'impatto
+                    } else {
+                        // Auto e camion uccidono il giocatore
+                        giocatore->vivo = 0;
+                        *statoCorrente = GAMEOVER;
+                        break;
+                    }
                 }
             }
 
-            // Calcola incremento distanza con fisica arcade: 10 sec a 60 km/h = 10 km
-            const double arcade_scale = 60.0;
-            double distance_increment = (giocatore->velocita * delta_sec / 3600.0) * arcade_scale;
-            giocatore->km += distance_increment;
+            // Incrementa i KM in base alla velocità
+            giocatore->km += (giocatore->velocita / 1000.0);
+
+            // Ogni 10 km aumenta la velocità di 15.0 (una sola volta)
+            if (giocatore->km >= prossimo_traguardo_km) {
+                giocatore->velocita += 15.0f;
+                if (giocatore->velocita > 150.0f) {
+                    giocatore->velocita = 150.0f; // Cap massimo alla velocità
+                }
+                prossimo_traguardo_km += 10.0;
+            }
+
+            giocatore->tempo++;
         }
 
         disegnaSchermo(giocatore, get_ostacoli());
 
-        // Delay fisso per tenere il loop a un frame rate stabile,
-        // ma la distanza è calcolata sul vero tempo trascorso.
+        // Calcola il tempo di attesa in base alla velocità
+        int pausa = 150000 - (int)(giocatore->velocita * 500);
+        if (pausa < 30000) {
+            pausa = 30000; // Minimo per non far diventare il gioco troppo veloce
+        }
+
+        // Ritardo dinamico basato sulla velocità
         #ifdef _WIN32
-            Sleep(50);
+            Sleep(pausa / 1000);
         #else
-            usleep(50 * 1000);
+            usleep(pausa);
         #endif
     }
 }

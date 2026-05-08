@@ -15,7 +15,7 @@ void genera_ostacolo();
 void aggiorna_ostacoli(float moltiplicatore_velocita);
 void disegna_ostacoli();
 
-// Fornisce accesso in sola lettura all'array di ostacoli per il controllo collisioni
-const Ostacolo* get_ostacoli();
+// Fornisce accesso all'array di ostacoli per il controllo collisioni
+Ostacolo* get_ostacoli();
 
 #endif // OBSTACLES_H

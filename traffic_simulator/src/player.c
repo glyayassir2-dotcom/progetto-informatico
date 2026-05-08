@@ -9,7 +9,8 @@ void inizializza_giocatore(Giocatore *g) {
     g->tempo = 0;
     g->punteggio = 0;
     g->vivo = 1;
-    g->velocita = 60.0f; // Velocità iniziale 60 km/h
+    g->velocita = 30.0f; // Velocità iniziale
+    g->penalita = 1.0f;  // Nessuna penalità all'inizio
     if (g->nome[0] == '\0') {
         strncpy(g->nome, "Anonimo", sizeof(g->nome) - 1);
         g->nome[sizeof(g->nome) - 1] = '\0';
