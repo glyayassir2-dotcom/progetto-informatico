@@ -11,6 +11,7 @@ void inizializza_giocatore(Giocatore *g) {
     g->vivo = 1;
     g->velocita = 30.0f; // Velocità iniziale
     g->penalita = 1.0f;  // Nessuna penalità all'inizio
+    g->tempo_inizio = time(NULL); // Salva il timestamp di inizio partita
     if (g->nome[0] == '\0') {
         strncpy(g->nome, "Anonimo", sizeof(g->nome) - 1);
         g->nome[sizeof(g->nome) - 1] = '\0';

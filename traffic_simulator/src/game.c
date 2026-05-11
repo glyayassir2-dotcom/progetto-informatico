@@ -107,7 +107,8 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
     inizializza_giocatore(giocatore);
     inizializza_ostacoli();
 
-    static double prossimo_traguardo_km = 10.0; // Variabile statica per l'aumento di velocità
+    // Variabile statica per tracciare gli incrementi di velocità ogni 5 km
+    static int ultimo_km_aumento = -1;
 
     while (*statoCorrente == GIOCO) {
         if (giocatore->vivo) {
@@ -150,24 +151,28 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
             // Incrementa i KM in base alla velocità
             giocatore->km += (giocatore->velocita / 1000.0);
 
-            // Ogni 10 km aumenta la velocità di 15.0 (una sola volta)
-            if (giocatore->km >= prossimo_traguardo_km) {
-                giocatore->velocita += 15.0f;
-                if (giocatore->velocita > 150.0f) {
-                    giocatore->velocita = 150.0f; // Cap massimo alla velocità
+            // Aumenta la velocità ogni 5 km (una sola volta per chilometro)
+            int km_attuale = (int)giocatore->km;
+            if (km_attuale % 5 == 0 && km_attuale != ultimo_km_aumento) {
+                giocatore->velocita += 10.0f;
+                // Limite massimo di velocità di picco: 200 km/h
+                if (giocatore->velocita > 200.0f) {
+                    giocatore->velocita = 200.0f;
                 }
-                prossimo_traguardo_km += 10.0;
+                ultimo_km_aumento = km_attuale;
             }
 
-            giocatore->tempo++;
+            // Calcola il tempo reale trascorso in secondi (non cicli del game loop)
+            giocatore->tempo = (int)(difftime(time(NULL), giocatore->tempo_inizio));
         }
 
         disegnaSchermo(giocatore, get_ostacoli());
 
         // Calcola il tempo di attesa in base alla velocità
         int pausa = 150000 - (int)(giocatore->velocita * 500);
-        if (pausa < 30000) {
-            pausa = 30000; // Minimo per non far diventare il gioco troppo veloce
+        // Limite minimo della pausa per permettere ai 200 km/h di sembrare davvero veloci
+        if (pausa < 25000) {
+            pausa = 25000;
         }
 
         // Ritardo dinamico basato sulla velocità

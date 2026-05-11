@@ -63,3 +63,14 @@ vhj,145.56,1657
 vhj,6.30,210
 vhj,1.89,63
 malaguti,1.89,63
+prodbyasso,39.51,1068
+prodbyasso,2.55,85
+prodbyasso,0.63,21
+prodbyasso,11.97,399
+prodbyasso,32.10,1070
+fefw,28.11,691
+fre,13.99,292
+k,2.05,62
+michele,2.43,8
+michele,1.23,6
+michele,18.75,70

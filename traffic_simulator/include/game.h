@@ -18,6 +18,7 @@ typedef struct {
     float velocita;
     float penalita; // riduce la velocità dopo aver preso una buca
     char nome[20];
+    time_t tempo_inizio; // Timestamp di inizio della partita (per misurare il tempo reale)
 } Giocatore;
 
 
