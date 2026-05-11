@@ -7,7 +7,7 @@ int random_int(int min, int max) {
     return min + rand() % (max - min + 1);
 }
 
-void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]) {
+void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[], int recordPersonale, int recordSuperato) {
     // Per ridurre lo sfarfallio (flickering), disegnamo l'intera schermata
     // in un buffer di caratteri in memoria e poi stampiamo il buffer
     // tutto in una volta. Questa tecnica è una forma semplificata di 
@@ -72,7 +72,16 @@ void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]) {
     #endif
 
     // Stampa le statistiche e la schermata
-    printf("KM: %.2f | Velocita: %.1f km/h\n", g->km, g->velocita);
+    printf("[%s] | KM: %d | KM/H: %d | Record Personale: %d\n",
+           g->nome[0] ? g->nome : "Anonimo",
+           (int)g->km,
+           (int)g->velocita,
+           recordPersonale);
+
+    if (recordSuperato) {
+        printf("\033[1;32mRECORD SUPERATO\033[0m\n");
+    }
+
     for (int i = 0; i < ALTEZZA_SCHERMO; i++) {
         for (int j = 0; j < NUM_CORSIE * 4 + 1; j++) {
             char c = schermo[i][j];

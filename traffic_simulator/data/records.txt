@@ -74,3 +74,6 @@ k,2.05,62
 michele,2.43,8
 michele,1.23,6
 michele,18.75,70
+q,1.55,5
+prodbyasso,3.27,11
+prodbyasso,42.83,107

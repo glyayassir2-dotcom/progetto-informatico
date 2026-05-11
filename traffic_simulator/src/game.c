@@ -57,6 +57,13 @@ void menuPrincipale(StatoGioco *statoCorrente, Giocatore *giocatore) {
 
 // Funzione per la schermata di Game Over
 void mostraGameOver(StatoGioco *statoCorrente, const Giocatore *giocatore) {
+    int recordPersonalePre = leggi_record_personale(giocatore->nome);
+    int nuovoRecordPersonale = (int)giocatore->km > recordPersonalePre;
+
+    if (nuovoRecordPersonale) {
+        printf("\nNUOVO RECORD PERSONALE !!\n\n");
+    }
+
     Record record;
     record.km = giocatore->km;
     strncpy(record.nome, giocatore->nome, sizeof(record.nome) - 1);
@@ -106,6 +113,9 @@ void mostraGameOver(StatoGioco *statoCorrente, const Giocatore *giocatore) {
 void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
     inizializza_giocatore(giocatore);
     inizializza_ostacoli();
+
+    int recordPersonale = leggi_record_personale(giocatore->nome);
+    int recordSuperato = 0;
 
     // Variabile statica per tracciare gli incrementi di velocità ogni 5 km
     static int ultimo_km_aumento = -1;
@@ -164,9 +174,10 @@ void gameLoop(StatoGioco *statoCorrente, Giocatore *giocatore) {
 
             // Calcola il tempo reale trascorso in secondi (non cicli del game loop)
             giocatore->tempo = (int)(difftime(time(NULL), giocatore->tempo_inizio));
+            recordSuperato = (int)giocatore->km > recordPersonale;
         }
 
-        disegnaSchermo(giocatore, get_ostacoli());
+        disegnaSchermo(giocatore, get_ostacoli(), recordPersonale, recordSuperato);
 
         // Calcola il tempo di attesa in base alla velocità
         int pausa = 150000 - (int)(giocatore->velocita * 500);

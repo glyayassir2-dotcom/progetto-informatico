@@ -47,6 +47,6 @@ void gestisciInput(Giocatore *giocatore);
 void inizializza_ostacoli();
 void aggiorna_ostacoli(float moltiplicatore_velocita);
 Ostacolo* get_ostacoli();
-void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]);
+void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[], int recordPersonale, int recordSuperato);
 
 #endif // GAME_H

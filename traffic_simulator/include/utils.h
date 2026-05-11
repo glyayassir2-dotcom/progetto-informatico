@@ -11,7 +11,7 @@
 
 // Funzioni di utilità generiche
 int random_int(int min, int max);
-void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[]);
+void disegnaSchermo(Giocatore *g, const Ostacolo ostacoli[], int recordPersonale, int recordSuperato);
 
 // Funzioni di input non bloccante per piattaforme POSIX
 int _kbhit(void);

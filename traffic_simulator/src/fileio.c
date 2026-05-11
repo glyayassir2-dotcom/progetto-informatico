@@ -38,6 +38,37 @@ void leggi_record(Record *records, int *num_records) {
     *num_records = count;
 }
 
+int leggi_record_personale(const char *nome) {
+    if (nome == NULL || nome[0] == '\0') {
+        return 0;
+    }
+
+    FILE *file = fopen("data/records.txt", "r");
+    if (file == NULL) {
+        return 0;
+    }
+
+    char line[128];
+    char record_nome[20];
+    double km;
+    int tempo;
+    int record_personale = 0;
+
+    while (fgets(line, sizeof(line), file) != NULL) {
+        if (sscanf(line, "%19[^,],%lf,%d", record_nome, &km, &tempo) == 3) {
+            if (strcmp(record_nome, nome) == 0) {
+                int km_intero = (int)km;
+                if (km_intero > record_personale) {
+                    record_personale = km_intero;
+                }
+            }
+        }
+    }
+
+    fclose(file);
+    return record_personale;
+}
+
 void salva_cronologia(const Giocatore *giocatore) {
     FILE *file = fopen("data/history.csv", "a");
     if (file == NULL) {
